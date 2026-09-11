@@ -1,16 +1,54 @@
-# React + Vite
+# VoiceGuard AI - Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This is the frontend component of the VoiceGuard AI application (SIH 2026), built using **React** and **Vite**. 
 
-Currently, two official plugins are available:
+## Architecture
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+The frontend follows a modern React functional component architecture. 
+- **Routing**: Client-side routing is handled via `react-router-dom` in `App.jsx`, organizing the interface into distinct pages.
+- **Styling**: Component-scoped styling is achieved using standard CSS files matched with their respective functional components.
+- **Service Layer**: Backend integrations are abstracted into a service layer (`services/api.js`) to decouple UI logic from data fetching.
+- **State Management**: Application states are managed contextually at the component level using React Hooks (`useState`, `useEffect`, `useRef`).
 
-## React Compiler
+## Folder Structure
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+```text
+frontend/
+├── public/                 # Static assets directly served to the client
+│   ├── logo.png            # Application logo and favicon
+│   └── logo-animation.mp4  # Animated logo clip
+├── src/                    # Source code
+│   ├── components/         # Reusable UI building blocks
+│   │   ├── Footer.jsx
+│   │   └── Navbar.jsx
+│   ├── pages/              # High-level route components
+│   │   ├── About.jsx
+│   │   ├── Detect.jsx
+│   │   ├── Home.jsx
+│   │   ├── Landing.jsx
+│   │   ├── LiveDetection.jsx
+│   │   └── Results.jsx
+│   ├── services/           # Abstraction for backend communications
+│   │   └── api.js          
+│   ├── styles/             # Dedicated CSS styles
+│   │   ├── about.css
+│   │   ├── detect.css
+│   │   ├── footer.css
+│   │   ├── global.css      # Application-wide global styling
+│   │   ├── home.css
+│   │   ├── landing.css
+│   │   ├── liveDetection.css
+│   │   ├── navbar.css
+│   │   └── results.css
+│   ├── App.jsx             # App core, defining layouts and routes
+│   └── main.jsx            # React root mount point
+├── eslint.config.js        # Linting profiles
+├── package.json            # NPM dependencies and scripts
+└── vite.config.js          # Vite build configuration
+```
 
-## Expanding the ESLint configuration
+## Running the Application
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+1. Make sure you have Node installed.
+2. Install dependencies: `npm install`
+3. Start the dev server: `npm run dev`

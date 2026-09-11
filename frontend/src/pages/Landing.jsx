@@ -11,16 +11,16 @@ function Landing() {
     const videoRef = useRef(null);
 
     useEffect(() => {
-        // Fade out after 2s, navigate after 2.5s
+        // Fade out after 2.5s, navigate after 3.5s (1s transition time from css)
         const fadeTimer = setTimeout(() => {
             if (pageRef.current) {
                 pageRef.current.classList.add("landing-fade-out");
             }
-        }, 1800);
+        }, 2500);
 
         const navTimer = setTimeout(() => {
             navigate("/home");
-        }, 2200);
+        }, 3500);
 
         return () => {
             clearTimeout(fadeTimer);
@@ -32,7 +32,7 @@ function Landing() {
         if (pageRef.current) {
             pageRef.current.classList.add("landing-fade-out");
         }
-        setTimeout(() => navigate("/home"), 500);
+        setTimeout(() => navigate("/home"), 1000);
     };
 
     return (
@@ -49,6 +49,10 @@ function Landing() {
                     playsInline
                     loop={false}
                 />
+            </div>
+
+            <div className="landing-team-name">
+                From 404
             </div>
 
         </div>

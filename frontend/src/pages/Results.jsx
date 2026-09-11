@@ -1,246 +1,131 @@
-import {
-  CheckCircle
-} from "lucide-react";
-
-import { useNavigate } from "react-router-dom";
-
+import { CheckCircle, AlertTriangle } from "lucide-react";
+import { useLocation, useNavigate, Navigate } from "react-router-dom";
+import { downloadReport } from "../services/api";
 import "../styles/results.css";
 
-
 function Results() {
-
   const navigate = useNavigate();
+  const location = useLocation();
 
+  const data = location.state?.data;
+
+  // Graceful fallback if opened directly without prior analysis
+  if (!data) {
+    return <Navigate to="/detect" replace />;
+  }
+
+  const handleDownload = async () => {
+    try {
+      const blob = await downloadReport(data.analysis_id);
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `voice-report-${data.analysis_id}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+    } catch (err) {
+      alert("Failed to download PDF report. Ensure backend PDF generation is active.");
+      console.error(err);
+    }
+  };
+
+  const confidencePercentage = (
+    (data.is_ai_generated ? data.ai_probability : 1 - data.ai_probability) * 100
+  ).toFixed(1);
 
   return (
-
     <div className="results-page">
-
       <div className="results-container">
-
-
         {/* HEADING */}
-
         <div className="page-heading">
-
-          <h1>
-            Detection Results
-          </h1>
-
+          <h1>Detection Results</h1>
           <p>
-            Report generated successfully.
-            Below is the computed confidence breakdown.
+            Report generated successfully. Below is the computed confidence breakdown.
           </p>
-
         </div>
 
-
         <div className="results-grid">
-
-
           {/* RESULT */}
-
           <div className="result-card">
-
             <div className="result-header">
-
-              <div className="success-icon">
-
-                <CheckCircle size={30} />
-
+              <div className="success-icon" style={{ background: data.is_ai_generated ? "var(--accent-red-hover)" : undefined }}>
+                {data.is_ai_generated ? <AlertTriangle size={30} /> : <CheckCircle size={30} />}
               </div>
-
 
               <div>
-
-                <h2>
-                  Human Voice Detected
-                </h2>
-
-                <p>
-                  Analyzed 12s of voice input
-                </p>
-
+                <h2>{data.is_ai_generated ? "AI Voice Detected" : "Human Voice Detected"}</h2>
+                <p>File: {data.filename || "Unknown Audio File"}</p>
               </div>
-
             </div>
-
 
             <div className="confidence-section">
-
-              <div className="confidence-circle">
-
-                <span>
-                  94.7%
+              <div className="confidence-circle" style={{ borderColor: data.is_ai_generated ? "var(--accent-red)" : undefined }}>
+                <span style={{ color: data.is_ai_generated ? "var(--accent-red)" : undefined }}>
+                  {confidencePercentage}%
                 </span>
-
               </div>
-
 
               <div>
-
-                <h3>
-                  Human Confidence Score
-                </h3>
-
-                <p>
-                  Very high confidence. The signal
-                  presents organic micro-modulations
-                  and natural structural pauses typical
-                  of biological vocal tracts.
-                </p>
-
+                <h3>{data.is_ai_generated ? "AI Confidence Score" : "Human Confidence Score"}</h3>
+                <p>{data.message}</p>
               </div>
-
             </div>
 
-
-            <h4 className="wave-title">
-
-              INPUT SIGNAL WAVEFORM (SEGMENT)
-
-            </h4>
-
-
+            <h4 className="wave-title">INPUT SIGNAL WAVEFORM (SEGMENT)</h4>
             <div className="result-waveform">
-
-              {Array.from(
-                { length: 40 },
-                (_, index) => (
-
-                  <span
-                    key={index}
-                    className="result-wave-bar"
-                  />
-
-                )
-              )}
-
+              {Array.from({ length: 40 }, (_, index) => (
+                <span key={index} className="result-wave-bar" />
+              ))}
             </div>
-
 
             <div className="result-buttons">
-
-              <button
-                className="primary-result-btn"
-                onClick={() =>
-                  navigate("/detect")
-                }
-              >
-
+              <button className="primary-result-btn" onClick={() => navigate("/detect")}>
                 Analyze Another
-
               </button>
 
-
-              <button className="download-btn">
-
+              <button className="download-btn" onClick={handleDownload} disabled={!data.analysis_id}>
                 Download Report
-
               </button>
-
             </div>
-
           </div>
 
-
-
           {/* FEATURE ANALYSIS */}
-
           <div className="feature-card">
+            <h2>Feature Variance Analysis</h2>
 
-            <h2>
-              Feature Variance Analysis
-            </h2>
-
-
-            <Feature
-              name="Pitch Consistency"
-              value="92%"
-            />
-
-            <Feature
-              name="Natural Pauses"
-              value="88%"
-            />
-
-            <Feature
-              name="Spectral Pattern"
-              value="96%"
-            />
-
-            <Feature
-              name="Micro-Variations"
-              value="93%"
-            />
-
+            <Feature name="Risk Level" value={(data.risk_level || "").toUpperCase()} />
+            <Feature name="Risk Score" value={data.risk_score ? (data.risk_score * 100).toFixed(1) + "%" : "0%"} />
+            <Feature name="AI Probability Base" value={(data.ai_probability * 100).toFixed(1) + "%"} />
 
             <hr />
 
-
-            <h4>
-              CLASSIFIER NOTE
-            </h4>
-
-
+            <h4>CLASSIFIER NOTE</h4>
             <p className="classifier-note">
-
-              Features extracted from Mel-Frequency
-              Cepstral Coefficients (MFCC) and spectral
-              centroid distribution. Temporal pauses
-              verified using root-mean-square energy
-              thresholds.
-
+              Results are based exclusively on live data from the backend analysis engine. Actual spectral pattern variations and fundamental frequencies were calculated securely backend-side to output this prediction map.
             </p>
-
           </div>
-
         </div>
-
       </div>
-
     </div>
   );
 }
 
-
-function Feature({
-  name,
-  value
-}) {
-
+function Feature({ name, value }) {
   return (
-
     <div className="feature">
-
       <div className="feature-label">
-
-        <span>
-          {name}
-        </span>
-
-        <strong>
-          {value}
-        </strong>
-
+        <span>{name}</span>
+        <strong>{value}</strong>
       </div>
-
-
       <div className="feature-progress">
-
         <div
           className="feature-progress-fill"
-          style={{
-            width: value
-          }}
+          style={{ width: value.includes('%') ? value : '100%' }}
         />
-
       </div>
-
     </div>
-
   );
 }
-
 
 export default Results;

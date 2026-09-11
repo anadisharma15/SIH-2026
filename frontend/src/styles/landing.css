@@ -14,7 +14,7 @@
   cursor: pointer;
   user-select: none;
   opacity: 1;
-  transition: opacity 0.5s ease;
+  transition: opacity 1s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .landing-page.landing-fade-out {
@@ -30,7 +30,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  animation: logoFadeIn 0.6s ease-out both;
+  animation: logoFadeIn 1s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
 }
 
 .landing-logo-video {
@@ -57,12 +57,14 @@
 @keyframes logoFadeIn {
   0% {
     opacity: 0;
-    transform: translateZ(0) scale(0.88);
+    transform: translateZ(0) scale(0.9);
+    filter: blur(4px);
   }
 
   100% {
     opacity: 1;
     transform: translateZ(0) scale(1);
+    filter: blur(0px);
   }
 }
 
@@ -77,4 +79,18 @@
     height: 140px;
     border-radius: 16px;
   }
+}
+
+.landing-team-name {
+  position: absolute;
+  bottom: 2rem;
+  font-size: 0.85rem;
+  color: #111;
+  /* Made the text darker */
+  font-weight: 600;
+  /* Also increased font weight slightly for better visibility */
+  letter-spacing: 1px;
+  animation: logoFadeIn 1.5s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+  animation-delay: 0.5s;
+  opacity: 0;
 }

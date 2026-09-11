@@ -1,5 +1,8 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from routes.analysis import router as analysis_router
+from routes.history import router as history_router
+from routes.live_detect import router as live_detect_router
 from sqlalchemy import text
 from database.database import engine
 
@@ -10,9 +13,26 @@ app = FastAPI(
     version="1.0.0"
 )
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Allow frontend to connect
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 app.include_router(
     analysis_router,
     prefix="/api"
+)
+
+app.include_router(
+    history_router,
+    prefix="/api"
+)
+
+app.include_router(
+    live_detect_router
 )
 
 

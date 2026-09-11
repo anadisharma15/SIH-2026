@@ -1,5 +1,5 @@
 // =============================================
-// VoiceGuard AI — Backend API Service
+// Vaani AI — Backend API Service
 // =============================================
 // 
 // TODO: Update BASE_URL once your backend is deployed.
@@ -7,7 +7,7 @@
 // =============================================
 
 
-const BASE_URL = "http://localhost:8000/api";
+const BASE_URL = "http://127.0.0.1:8000/api";
 
 
 // ---- AUDIO UPLOAD & DETECTION ----
@@ -24,7 +24,7 @@ export async function analyzeAudio(audioFile) {
     formData.append("file", audioFile);
 
     const response = await fetch(
-        `${BASE_URL}/detect`,
+        `${BASE_URL}/analyze`,
         {
             method: "POST",
             body: formData,

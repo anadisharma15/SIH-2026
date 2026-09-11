@@ -24,7 +24,7 @@ export async function analyzeAudio(audioFile) {
     formData.append("file", audioFile);
 
     const response = await fetch(
-        `${BASE_URL}/detect`,
+        `${BASE_URL}/analyze`,
         {
             method: "POST",
             body: formData,

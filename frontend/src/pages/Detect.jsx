@@ -38,7 +38,7 @@ function Detect() {
       navigate("/results", { state: { data: result } });
     } catch (error) {
       console.error(error);
-      alert("Analysis failed or backend is down.");
+      alert(error);
       setIsAnalyzing(false);
     }
   };

@@ -51,6 +51,10 @@ function Landing() {
                 />
             </div>
 
+            <div className="landing-team-name">
+                From 404
+            </div>
+
         </div>
     );
 }

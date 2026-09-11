@@ -80,3 +80,17 @@
     border-radius: 16px;
   }
 }
+
+.landing-team-name {
+  position: absolute;
+  bottom: 2rem;
+  font-size: 0.85rem;
+  color: #111;
+  /* Made the text darker */
+  font-weight: 600;
+  /* Also increased font weight slightly for better visibility */
+  letter-spacing: 1px;
+  animation: logoFadeIn 1.5s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+  animation-delay: 0.5s;
+  opacity: 0;
+}

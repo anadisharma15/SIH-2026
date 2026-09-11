@@ -19,12 +19,12 @@ function Footer() {
 
             <div className="footer-icon">
 
-              <img src="/logo.png" alt="VoiceGuard AI" className="footer-logo-img" />
+              <img src="/logo.png" alt="Vaani AI" className="footer-logo-img" />
 
             </div>
 
             <span>
-              VoiceGuard AI
+              <span style={{ color: 'black' }}>Vaani</span> <span style={{ color: 'blue' }}>AI</span>
             </span>
 
           </div>
@@ -58,11 +58,11 @@ function Footer() {
         <div className="footer-bottom">
 
           <span>
-            © 2026 VoiceGuard AI. University Capstone Project.
+            © Vaani AI.
           </span>
 
           <span>
-            Designed & Built with React, FastAPI & TensorFlow
+            Designed & Built to Prevent Digital Threat & Scam
           </span>
 
         </div>

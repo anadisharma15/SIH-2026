@@ -15,11 +15,11 @@ function Navbar() {
         <div className="logo">
 
           <div className="logo-icon">
-            <img src="/logo.png" alt="VoiceGuard AI" className="logo-img" />
+            <img src="/logo.png" alt="Vaani AI" className="logo-img" />
           </div>
 
           <span>
-            VoiceGuard AI
+            <span style={{ color: 'black' }}>Vaani</span> <span style={{ color: 'blue' }}>AI</span>
           </span>
 
         </div>

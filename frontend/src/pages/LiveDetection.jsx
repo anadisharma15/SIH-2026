@@ -12,6 +12,8 @@ function LiveDetection() {
 
   const navigate = useNavigate();
   const wsRef = useRef(null);
+  const mediaRecorderRef = useRef(null);
+  const streamRef = useRef(null);
 
   useEffect(() => {
     // Only timer is required here
@@ -29,50 +31,80 @@ function LiveDetection() {
     setLogs((prev) => [...prev, `[${time}] ${message}`].slice(-6));
   };
 
-  const handleRecording = () => {
-    setIsRecording((recording) => {
-      if (!recording) {
-        setDuration(0);
-        addLog("Attempting WebSocket handshake...");
+  const startRecording = async () => {
+    try {
+      addLog("Requesting microphone access...");
+      // Request microphone access
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      streamRef.current = stream;
+      addLog("Microphone permission granted.");
 
-        try {
-          const { socket, close } = connectLiveDetection(
-            (data) => {
-              if (data.type === "probabilities") {
-                setLiveData({ human: data.human * 100, ai: data.ai * 100 });
-              } else if (data.type === "log") {
-                addLog(data.message);
-              }
-            },
-            (error) => {
-              addLog("WebSocket error or backend unavailable.");
+      setDuration(0);
+      addLog("Attempting WebSocket handshake...");
+
+      try {
+        const { socket, close } = connectLiveDetection(
+          (data) => {
+            if (data.type === "probabilities") {
+              setLiveData({ human: data.human * 100, ai: data.ai * 100 });
+            } else if (data.type === "log") {
+              addLog(data.message);
             }
-          );
+          },
+          (error) => {
+            addLog("WebSocket error or backend unavailable.");
+          }
+        );
 
-          wsRef.current = { close };
-          addLog("WebSocket initiated.");
-        } catch (err) {
-          addLog("Failed to initiate WebSocket. Backend inactive.");
-        }
+        wsRef.current = { socket, close };
+        addLog("WebSocket initiated.");
 
-      } else {
-        // Disconnecting
-        if (wsRef.current) {
-          wsRef.current.close();
-          wsRef.current = null;
-        }
-        addLog("WebSocket disconnected.");
+        // Start MediaRecorder
+        const mediaRecorder = new MediaRecorder(stream);
+        mediaRecorderRef.current = mediaRecorder;
+
+        mediaRecorder.ondataavailable = (event) => {
+          if (event.data.size > 0 && wsRef.current?.socket?.readyState === WebSocket.OPEN) {
+            wsRef.current.socket.send(event.data);
+          }
+        };
+
+        mediaRecorder.start(1000); // 1-second chunks
+      } catch (err) {
+        addLog("Failed to initiate WebSocket. Backend inactive.");
       }
 
-      return !recording;
-    });
+      setIsRecording(true);
+    } catch (err) {
+      addLog("Microphone access denied or error: " + err.message);
+    }
+  };
+
+  const stopRecordingBase = () => {
+    if (mediaRecorderRef.current && mediaRecorderRef.current.state !== "inactive") {
+      mediaRecorderRef.current.stop();
+    }
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach(track => track.stop());
+    }
+    if (wsRef.current) {
+      wsRef.current.close();
+      wsRef.current = null;
+    }
+    setIsRecording(false);
+  };
+
+  const handleRecording = () => {
+    if (!isRecording) {
+      startRecording();
+    } else {
+      stopRecordingBase();
+      addLog("WebSocket disconnected.");
+    }
   };
 
   const stopAndReport = () => {
-    if (wsRef.current) {
-      wsRef.current.close();
-    }
-    setIsRecording(false);
+    stopRecordingBase();
 
     // Instead of navigating blindly, we could navigate with the aggregated result
     // We'll pass the last liveData as a mock for the Results page for now.
@@ -126,7 +158,7 @@ function LiveDetection() {
                   loop
                 />
               ) : (
-                <img src="/logo.png" alt="Start VoiceGuard AI" className="record-logo-img" />
+                <img src="/logo.png" alt="Start Vaani AI" className="record-logo-img" />
               )}
             </button>
 

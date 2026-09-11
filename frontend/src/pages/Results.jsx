@@ -1,5 +1,6 @@
-import { CheckCircle, AlertTriangle } from "lucide-react";
+import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate, Navigate } from "react-router-dom";
+import { ArrowLeft, CheckCircle, AlertTriangle, ShieldCheck, HelpCircle } from "lucide-react";
 import { downloadReport } from "../services/api";
 import "../styles/results.css";
 
@@ -30,10 +31,6 @@ function Results() {
     }
   };
 
-  const confidencePercentage = (
-    (data.is_ai_generated ? data.ai_probability : 1 - data.ai_probability) * 100
-  ).toFixed(1);
-
   return (
     <div className="results-page">
       <div className="results-container">
@@ -48,26 +45,33 @@ function Results() {
         <div className="results-grid">
           {/* RESULT */}
           <div className="result-card">
-            <div className="result-header">
-              <div className="success-icon" style={{ background: data.is_ai_generated ? "var(--accent-red-hover)" : undefined }}>
-                {data.is_ai_generated ? <AlertTriangle size={30} /> : <CheckCircle size={30} />}
+            <div className="status-header">
+              <div
+                className={`status-icon ${data.is_ai_generated === "Uncertain" ? "uncertain"
+                    : data.is_ai_generated ? "danger" : "safe"
+                  }`}
+              >
+                {data.is_ai_generated === "Uncertain" ? <HelpCircle size={30} />
+                  : data.is_ai_generated ? <AlertTriangle size={30} /> : <CheckCircle size={30} />}
               </div>
 
               <div>
-                <h2>{data.is_ai_generated ? "AI Voice Detected" : "Human Voice Detected"}</h2>
+                <h2>{data.is_ai_generated === "Uncertain" ? "Uncertain Detection"
+                  : data.is_ai_generated ? "AI Voice Detected" : "Human Voice Detected"}</h2>
                 <p>File: {data.filename || "Unknown Audio File"}</p>
               </div>
             </div>
 
             <div className="confidence-section">
-              <div className="confidence-circle" style={{ borderColor: data.is_ai_generated ? "var(--accent-red)" : undefined }}>
-                <span style={{ color: data.is_ai_generated ? "var(--accent-red)" : undefined }}>
-                  {confidencePercentage}%
+              <div className="confidence-circle" style={{ borderColor: data.is_ai_generated === "Uncertain" ? "var(--warning-yellow)" : data.is_ai_generated ? "var(--accent-red)" : undefined }}>
+                <span style={{ color: data.is_ai_generated === "Uncertain" ? "var(--warning-yellow)" : data.is_ai_generated ? "var(--accent-red)" : undefined }}>
+                  {data.risk_score}%
                 </span>
               </div>
 
               <div>
-                <h3>{data.is_ai_generated ? "AI Confidence Score" : "Human Confidence Score"}</h3>
+                <h3>{data.is_ai_generated === "Uncertain" ? "Resultant Risk Score"
+                  : data.is_ai_generated ? "AI Risk Score" : "Human Risk Score"}</h3>
                 <p>{data.message}</p>
               </div>
             </div>
@@ -95,7 +99,7 @@ function Results() {
             <h2>Feature Variance Analysis</h2>
 
             <Feature name="Risk Level" value={(data.risk_level || "").toUpperCase()} />
-            <Feature name="Risk Score" value={data.risk_score ? (data.risk_score * 100).toFixed(1) + "%" : "0%"} />
+            <Feature name="Risk Score" value={data.risk_score ? (data.risk_score).toFixed(1) + "%" : "0%"} />
             <Feature name="AI Probability Base" value={(data.ai_probability * 100).toFixed(1) + "%"} />
 
             <hr />
